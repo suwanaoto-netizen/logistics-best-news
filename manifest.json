@@ -2,7 +2,7 @@
   "name": "LogisticsBestNews",
   "short_name": "物流ニュース",
   "description": "物流・運送業界の最新ニュースを毎日お届け",
-  "start_url": "/",
+  "start_url": "/logistics-best-news/",
   "display": "standalone",
   "background_color": "#f9fafb",
   "theme_color": "#16a34a",
