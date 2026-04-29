@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="LogisticsBestNews">
+<meta name="theme-color" content="#16a34a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.svg">
+<title>LogisticsBestNews</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g50:#f0faf4;--g100:#d4f0e1;--g400:#22c55e;--g500:#16a34a;--g600:#15803d;--g700:#166534;
+  --gray50:#f9fafb;--gray100:#f3f4f6;--gray200:#e5e7eb;--gray300:#d1d5db;
+  --gray400:#9ca3af;--gray500:#6b7280;--gray700:#374151;--gray900:#111827;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--gray50);min-height:100dvh;padding-bottom:env(safe-area-inset-bottom);}
+
+/* Header */
+.topbar{background:#fff;border-bottom:0.5px solid var(--gray200);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.logo{display:flex;align-items:center;gap:8px;}
+.logo-mark{width:26px;height:26px;background:var(--g500);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-mark svg{width:14px;height:14px;fill:#fff;}
+.logo-name{font-size:15px;font-weight:600;color:var(--gray900);letter-spacing:-0.4px;}
+.logo-name span{color:var(--g500);}
+.hdate{font-size:11px;color:var(--gray400);}
+
+/* Main */
+.main{max-width:640px;margin:0 auto;padding:16px 12px;}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.stat-card{background:#fff;border:0.5px solid var(--gray200);border-radius:10px;padding:12px;}
+.stat-label{font-size:10px;color:var(--gray400);margin-bottom:4px;font-weight:500;letter-spacing:0.3px;}
+.stat-val{font-size:22px;font-weight:600;color:var(--gray900);}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;background:var(--gray100);border-radius:8px;padding:3px;margin-bottom:14px;}
+.tab{flex:1;text-align:center;padding:7px 6px;font-size:12px;font-weight:500;color:var(--gray500);border-radius:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.15s;}
+.tab.active{background:#fff;color:var(--g600);border:0.5px solid var(--gray200);}
+
+/* Today panel */
+.action-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;}
+.status{font-size:12px;color:var(--gray500);display:flex;align-items:center;gap:5px;flex:1;min-width:0;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--g400);flex-shrink:0;}
+.status-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fetch-btn{background:var(--g500);color:#fff;border:none;border-radius:8px;padding:0 14px;height:40px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.fetch-btn:active{background:var(--g700);transform:scale(0.97);}
+.fetch-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.fetch-btn svg{width:13px;height:13px;fill:#fff;}
+
+/* DB panel */
+.controls{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.search{width:100%;height:40px;border:0.5px solid var(--gray300);border-radius:8px;padding:0 12px;font-size:16px;color:var(--gray900);background:#fff;outline:none;-webkit-appearance:none;}
+.search:focus{border-color:var(--g400);box-shadow:0 0 0 3px rgba(34,197,94,0.12);}
+.filter-row{display:flex;gap:8px;}
+.sel{flex:1;height:40px;border:0.5px solid var(--gray300);border-radius:8px;padding:0 10px;font-size:13px;color:var(--gray700);background:#fff;outline:none;-webkit-appearance:none;min-width:0;}
+.sel:focus{border-color:var(--g400);}
+.result-meta{font-size:12px;color:var(--gray400);margin-bottom:8px;}
+
+/* Cards */
+.news-list{display:flex;flex-direction:column;gap:8px;}
+.news-card{background:#fff;border:0.5px solid var(--gray200);border-radius:10px;padding:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color 0.12s;}
+.news-card:active{background:var(--g50);border-color:var(--g400);}
+.card-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.card-num{font-size:12px;color:var(--gray400);min-width:16px;padding-top:2px;font-weight:500;flex-shrink:0;}
+.card-pill{font-size:10px;font-weight:500;padding:2px 7px;border-radius:99px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.pill-dx{background:#dcfce7;color:#15803d;}
+.pill-reg{background:#ede9fe;color:#5b21b6;}
+.pill-driver{background:#fef3c7;color:#92400e;}
+.pill-ma{background:#fee2e2;color:#991b1b;}
+.pill-general{background:var(--gray100);color:var(--gray500);}
+.card-hl{font-size:14px;font-weight:500;color:var(--gray900);line-height:1.5;flex:1;}
+.card-sum{font-size:12px;color:var(--gray500);line-height:1.65;padding-left:24px;}
+.card-meta{display:flex;align-items:center;gap:5px;margin-top:6px;padding-left:24px;flex-wrap:wrap;}
+.card-src{font-size:11px;color:var(--gray400);}
+.meta-sep{width:3px;height:3px;border-radius:50%;background:var(--gray300);flex-shrink:0;}
+
+.date-label{font-size:11px;font-weight:500;color:var(--gray400);margin:14px 0 6px;letter-spacing:0.3px;}
+
+/* Empty / spinner */
+.empty{padding:2.5rem 1rem;text-align:center;}
+.empty-icon{width:40px;height:40px;border-radius:10px;background:var(--gray100);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;}
+.empty-icon svg{width:20px;height:20px;fill:var(--gray400);}
+.empty-title{font-size:14px;font-weight:500;color:var(--gray700);margin-bottom:4px;}
+.empty-sub{font-size:12px;color:var(--gray400);line-height:1.6;}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.35);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* Config modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-end;}
+.modal-bg.open{display:flex;}
+.modal{background:#fff;border-radius:16px 16px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));width:100%;max-height:80dvh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:600;color:var(--gray900);margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(--gray500);margin-bottom:20px;line-height:1.6;}
+.field-label{font-size:12px;font-weight:500;color:var(--gray700);margin-bottom:6px;}
+.field-input{width:100%;height:42px;border:0.5px solid var(--gray300);border-radius:8px;padding:0 12px;font-size:14px;color:var(--gray900);background:#fff;outline:none;margin-bottom:14px;font-family:monospace;}
+.field-input:focus{border-color:var(--g400);}
+.modal-save{width:100%;background:var(--g500);color:#fff;border:none;border-radius:8px;height:44px;font-size:14px;font-weight:500;cursor:pointer;}
+.modal-save:active{background:var(--g700);}
+.settings-btn{background:none;border:0.5px solid var(--gray300);border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.settings-btn svg{width:16px;height:16px;fill:var(--gray500);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16"><path d="M2 11l4-7 3 5 2-3 3 5H2z"/></svg>
+    </div>
+    <span class="logo-name">Logistics<span>Best</span>News</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span class="hdate" id="hdate"></span>
+    <button class="settings-btn" id="settings-btn" title="設定">
+      <svg viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4zm7.07-2.93a7 7 0 00.14-1.07 7 7 0 00-.14-1.07l2.3-1.8a.5.5 0 00.12-.64l-2.18-3.77a.5.5 0 00-.61-.22l-2.71 1.09a7.1 7.1 0 00-1.85-1.07L11.7.63A.5.5 0 0011.2.2H7.8a.5.5 0 00-.5.43L6.98 3.54a7.1 7.1 0 00-1.85 1.07L2.42 3.52a.5.5 0 00-.61.22L-.37 7.51a.49.49 0 00.12.64l2.3 1.8A7.15 7.15 0 002 10a7 7 0 00.05 1.07l-2.3 1.8a.5.5 0 00-.12.64l2.18 3.77c.12.22.38.3.61.22l2.71-1.09c.58.41 1.2.75 1.85 1.07l.32 2.91c.06.24.27.41.5.41h3.4c.24 0 .44-.17.5-.41l.32-2.91a7.1 7.1 0 001.85-1.07l2.71 1.09c.23.08.49 0 .61-.22l2.18-3.77a.49.49 0 00-.12-.64l-2.3-1.8z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">本日取得</div><div class="stat-val" id="s-today">—</div></div>
+    <div class="stat-card"><div class="stat-label">DB総件数</div><div class="stat-val" id="s-total">—</div></div>
+    <div class="stat-card"><div class="stat-label">蓄積日数</div><div class="stat-val" id="s-days">—</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="today">今日のピックアップ</div>
+    <div class="tab" data-tab="db">ニュースDB <span id="db-cnt"></span></div>
+  </div>
+
+  <div class="panel active" id="panel-today">
+    <div class="action-row">
+      <div class="status">
+        <span class="status-dot"></span>
+        <span class="status-text" id="today-status">毎朝8:30に自動更新</span>
+      </div>
+      <button class="fetch-btn" id="fetch-btn">
+        <svg viewBox="0 0 16 16"><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5v2L11 2l-3-2.5v2A7 7 0 1 0 15 8h-1.5z"/></svg>
+        今すぐ取得
+      </button>
+    </div>
+    <div class="news-list" id="today-list">
+      <div class="empty">
+        <div class="empty-icon"><svg viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm1 11H9V9h2v4zm0-6H9V5h2v2z"/></svg></div>
+        <div class="empty-title">ニュースがまだありません</div>
+        <div class="empty-sub">「今すぐ取得」で最新5件を<br>Supabase DBに保存します</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-db">
+    <div class="controls">
+      <input class="search" type="search" placeholder="キーワードで検索..." id="kw-input" />
+      <div class="filter-row">
+        <select class="sel" id="cat-sel">
+          <option value="">すべてのカテゴリー</option>
+          <option value="dx">物流DX・テクノロジー</option>
+          <option value="reg">規制・法改正</option>
+          <option value="driver">ドライバー・人材</option>
+          <option value="ma">M&A・企業動向</option>
+          <option value="general">物流全般</option>
+        </select>
+        <select class="sel" id="date-sel">
+          <option value="">すべての日付</option>
+        </select>
+      </div>
+    </div>
+    <div class="result-meta" id="result-meta"></div>
+    <div class="news-list" id="db-list">
+      <div class="empty">
+        <div class="empty-icon"><svg viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm5 10H7v-2h3v2zm3 0h-2v-2h2v2zm-3-4H7V7h3v2zm3 0h-2V7h2v2z"/></svg></div>
+        <div class="empty-title">DBにデータがありません</div>
+        <div class="empty-sub">まず設定からSupabaseの<br>URLとキーを登録してください</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-title">接続設定</div>
+    <div class="modal-sub">SupabaseのURLとAnon Keyを入力してください。<br>設定はこのデバイスに保存されます。</div>
+    <div class="field-label">Supabase URL</div>
+    <input class="field-input" id="cfg-url" type="url" placeholder="https://xxxx.supabase.co" />
+    <div class="field-label">Supabase Anon Key</div>
+    <input class="field-input" id="cfg-key" type="password" placeholder="eyJhbGci..." />
+    <button class="modal-save" id="modal-save">保存して接続</button>
+  </div>
+</div>
+
+<script>
+const CAT={
+  dx:{label:'物流DX・テクノロジー',cls:'pill-dx'},
+  reg:{label:'規制・法改正',cls:'pill-reg'},
+  driver:{label:'ドライバー・人材',cls:'pill-driver'},
+  ma:{label:'M&A・企業動向',cls:'pill-ma'},
+  general:{label:'物流全般',cls:'pill-general'}
+};
+
+const now=new Date();
+const dateStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+const dateJP=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+document.getElementById('hdate').textContent=dateJP;
+
+let allDb=[];
+let curTab='today';
+
+// Config (localStorage)
+function getCfg(){return{url:localStorage.getItem('sb-url')||'',key:localStorage.getItem('sb-key')||''};}
+function saveCfg(url,key){localStorage.setItem('sb-url',url);localStorage.setItem('sb-key',key);}
+
+// Supabase REST API helper
+async function sbSelect(cfg){
+  const res=await fetch(`${cfg.url}/rest/v1/news?select=*&order=fetched_date.desc,id.desc`,{
+    headers:{'apikey':cfg.key,'Authorization':`Bearer ${cfg.key}`,'Content-Type':'application/json'}
+  });
+  if(!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+async function sbInsert(cfg,rows){
+  const res=await fetch(`${cfg.url}/rest/v1/news`,{
+    method:'POST',
+    headers:{'apikey':cfg.key,'Authorization':`Bearer ${cfg.key}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify(rows)
+  });
+  if(!res.ok) throw new Error(await res.text());
+}
+async function sbDeleteDate(cfg,date){
+  await fetch(`${cfg.url}/rest/v1/news?fetched_date=eq.${date}`,{
+    method:'DELETE',
+    headers:{'apikey':cfg.key,'Authorization':`Bearer ${cfg.key}`}
+  });
+}
+
+function fmtDate(d){if(!d)return'';const[y,m,day]=d.split('-');return`${y}年${parseInt(m)}月${parseInt(day)}日`;}
+
+function cardHTML(n,idx){
+  const cat=CAT[n.category]||CAT.general;
+  const numEl=idx!=null?`<span class="card-num">${idx}</span>`:'';
+  return`<div class="news-card">
+    <div class="card-top">
+      ${numEl}
+      <span class="card-pill ${cat.cls}">${cat.label}</span>
+      <span class="card-hl">${n.headline}</span>
+    </div>
+    <div class="card-sum">${n.summary}</div>
+    <div class="card-meta">
+      ${n.fetched_date?`<span class="card-src">${fmtDate(n.fetched_date)}</span><div class="meta-sep"></div>`:''}
+      <span class="card-src">${n.source||''}</span>
+      ${n.hours_ago?`<div class="meta-sep"></div><span class="card-src">${n.hours_ago}</span>`:''}
+    </div>
+  </div>`;
+}
+
+function updateStats(db){
+  const days=new Set(db.map(n=>n.fetched_date)).size;
+  document.getElementById('s-total').textContent=db.length;
+  document.getElementById('s-days').textContent=days;
+  document.getElementById('db-cnt').textContent=db.length>0?`(${db.length})`:'';
+  const todayItems=db.filter(n=>n.fetched_date===dateStr);
+  document.getElementById('s-today').textContent=todayItems.length||'—';
+}
+
+function updateDateSel(db){
+  const dates=[...new Set(db.map(n=>n.fetched_date))].sort((a,b)=>b.localeCompare(a));
+  const sel=document.getElementById('date-sel');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">すべての日付</option>';
+  dates.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=fmtDate(d);sel.appendChild(o);});
+  sel.value=cur;
+}
+
+function renderDB(){
+  const kw=document.getElementById('kw-input').value.trim().toLowerCase();
+  const cat=document.getElementById('cat-sel').value;
+  const date=document.getElementById('date-sel').value;
+  let arr=allDb;
+  if(cat) arr=arr.filter(n=>n.category===cat);
+  if(date) arr=arr.filter(n=>n.fetched_date===date);
+  if(kw) arr=arr.filter(n=>(n.headline+n.summary+(n.source||'')).toLowerCase().includes(kw));
+  document.getElementById('result-meta').textContent=`${arr.length}件表示`;
+  if(!arr.length){
+    document.getElementById('db-list').innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm1 11H9V9h2v4zm0-6H9V5h2v2z"/></svg></div><div class="empty-title">該当するニュースがありません</div><div class="empty-sub">条件を変えてお試しください</div></div>`;
+    return;
+  }
+  const byDate={};
+  arr.forEach(n=>{byDate[n.fetched_date]=byDate[n.fetched_date]||[];byDate[n.fetched_date].push(n);});
+  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+  let html='';
+  dates.forEach(d=>{
+    html+=`<div class="date-label">${fmtDate(d)}</div>`;
+    html+=byDate[d].map((n,i)=>cardHTML(n,i+1)).join('');
+  });
+  document.getElementById('db-list').innerHTML=html;
+}
+
+async function loadFromSupabase(){
+  const cfg=getCfg();
+  if(!cfg.url||!cfg.key) return;
+  try{
+    allDb=await sbSelect(cfg);
+    updateStats(allDb);
+    updateDateSel(allDb);
+    const todayItems=allDb.filter(n=>n.fetched_date===dateStr);
+    if(todayItems.length){
+      document.getElementById('today-list').innerHTML=todayItems.map((n,i)=>cardHTML(n,i+1)).join('');
+      document.getElementById('today-status').textContent=`${dateJP} — DBから読込 (${todayItems.length}件)`;
+    }
+    if(curTab==='db') renderDB();
+  }catch(e){
+    document.getElementById('today-status').textContent='DB接続エラー — 設定を確認してください';
+  }
+}
+
+async function fetchNews(){
+  const cfg=getCfg();
+  if(!cfg.url||!cfg.key){
+    document.getElementById('modal-bg').classList.add('open');
+    return;
+  }
+  const btn=document.getElementById('fetch-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> 取得中...';
+  document.getElementById('today-status').textContent='ニュースを検索中...';
+
+  const prompt=`あなたは物流・運送業界のニュースキュレーターです。
+${dateJP}の日本の物流・運送・荷主に関する最新ニュースを5件ピックアップしてください。
+特に「物流テクノロジー・DX」「規制・法改正」を優先してください。
+
+JSONのみで返答。前置き不要、\`\`\`も不要。
+
+[{"headline":"見出し30文字以内","summary":"2〜3文の要約。具体的数字・企業名を含む","category":"dx|reg|driver|ma|general","source":"メディア名","hours_ago":"N時間前 または 本日"}]`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const tb=data.content.find(b=>b.type==='text');
+    const raw=tb?tb.text.replace(/```json|```/g,'').trim():'[]';
+    const arr=JSON.parse(raw.match(/\[[\s\S]*\]/)?.[0]||'[]');
+    const rows=arr.map(n=>({headline:n.headline,summary:n.summary,category:n.category,source:n.source,hours_ago:n.hours_ago,fetched_date:dateStr}));
+
+    await sbDeleteDate(cfg,dateStr);
+    await sbInsert(cfg,rows);
+
+    await loadFromSupabase();
+    document.getElementById('today-status').textContent=`${dateJP} — ${rows.length}件をDBに保存しました`;
+  }catch(e){
+    document.getElementById('today-status').textContent='取得エラー — 再試行してください';
+  }
+  btn.disabled=false;
+  btn.innerHTML='<svg viewBox="0 0 16 16" style="width:13px;height:13px;fill:#fff;"><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5v2L11 2l-3-2.5v2A7 7 0 1 0 15 8h-1.5z"/></svg> 今すぐ取得';
+}
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    curTab=t.dataset.tab;
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+curTab).classList.add('active');
+    if(curTab==='db') renderDB();
+  });
+});
+
+document.getElementById('fetch-btn').addEventListener('click',fetchNews);
+['kw-input','cat-sel','date-sel'].forEach(id=>document.getElementById(id).addEventListener('input',renderDB));
+
+// Settings modal
+document.getElementById('settings-btn').addEventListener('click',()=>{
+  const cfg=getCfg();
+  document.getElementById('cfg-url').value=cfg.url;
+  document.getElementById('cfg-key').value=cfg.key;
+  document.getElementById('modal-bg').classList.add('open');
+});
+document.getElementById('modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+document.getElementById('modal-save').addEventListener('click',()=>{
+  const url=document.getElementById('cfg-url').value.trim().replace(/\/$/,'');
+  const key=document.getElementById('cfg-key').value.trim();
+  if(!url||!key){alert('URLとキーを入力してください');return;}
+  saveCfg(url,key);
+  document.getElementById('modal-bg').classList.remove('open');
+  loadFromSupabase();
+});
+
+// PWA install prompt
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// Init
+const cfg=getCfg();
+if(cfg.url&&cfg.key) loadFromSupabase();
+else{
+  document.getElementById('today-status').textContent='設定アイコンからSupabaseを設定してください';
+}
+</script>
+</body>
+</html>

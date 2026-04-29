@@ -1,0 +1,27 @@
+name: Daily News Fetch
+
+on:
+  schedule:
+    # 毎朝8:30 JST = 23:30 UTC (前日)
+    - cron: '30 23 * * *'
+  workflow_dispatch:  # 手動実行も可能
+
+jobs:
+  fetch-news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install node-fetch@3
+
+      - name: Fetch and save news
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node fetch-news.js
